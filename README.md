@@ -40,9 +40,10 @@ or host locally (the easiest way is with Docker).
 Let's take a look into how we can bootstrap RestFlex from a terminal:
 
 ```bash
+export DOMAIN=personal-finances
 export AUTH0_DOMAIN=digituz-corp.auth0.com
-export AUTH0_AUDIENCE=https://digituz-corp.auth0.com/contacts
-export MONGODB_URL=http://localhost:27017/contacts
+export AUTH0_AUDIENCE=https://digituz-corp.auth0.com/personal-finances
+export MONGODB_URL=localhost:27017/personal-finances
 
 npm start
 ```
