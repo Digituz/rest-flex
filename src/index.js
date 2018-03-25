@@ -13,13 +13,16 @@ app.use(async function exceptionHandler(ctx, next) {
   try {
     await next();
   } catch (err) {
-    ctx.status = 400;
+    ctx.status = err.statusCode || 400;
     if (err.message && err.message.indexOf('Unexpected token') === 0 && err.message.indexOf('JSON') > 1){
       ctx.body = { 'message': 'It looks like the filter parameter passed contains a wrong structure.' }
     } else {
       console.error('### Oooops!');
       console.error(`### An error occurred on ${(new Date()).toString()}`);
       console.error(err);
+      ctx.body = {
+        'message': err.message || 'Ooops, something went wrong.'
+      }
     }
   }
 });
