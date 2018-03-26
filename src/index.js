@@ -17,9 +17,11 @@ app.use(async function exceptionHandler(ctx, next) {
     if (err.message && err.message.indexOf('Unexpected token') === 0 && err.message.indexOf('JSON') > 1){
       ctx.body = { 'message': 'It looks like the filter parameter passed contains a wrong structure.' }
     } else {
-      console.error('### Oooops!');
-      console.error(`### An error occurred on ${(new Date()).toString()}`);
-      console.error(err);
+      if (err.name !== 'UnauthorizedError') {
+        console.error('### Oooops!');
+        console.error(`### An error occurred on ${(new Date()).toString()}`);
+        console.error(err);
+      }
       ctx.body = {
         'message': err.message || 'Ooops, something went wrong.'
       }
