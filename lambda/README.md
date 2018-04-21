@@ -146,11 +146,37 @@ aws apigateway put-integration-response \
 
 > Similarly to the method request, you can use the Method Response section to define the public interface of your API. For example, you can specify which HTTP status codes the method supports, and, for each status code, which body model and headers the method can return. The values for the body and headers are assigned to the fields in the integration response step.
 
+
+```bash
+aws apigateway create-model \
+    --rest-api-id $API_ID \
+    --content-type application/json \
+    --name TasksModel \
+    --schema '{
+      "$schema": "http://json-schema.org/draft-04/schema#",
+      "title": "TasksModel",
+      "type": "object",
+      "properties": {
+        "tasks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "_id": { "type": "string" },
+              "description": { "type": "string" }
+            }
+          }
+        }
+      }
+    }'
+```
+
 ```bash
 aws apigateway put-method-response \
     --rest-api-id $API_ID \
     --resource-id $PERSONAL_FINANCES_RESOURCE_ID \
     --http-method GET \
+    --response-models '{"application/json":"TasksModel"}'  \
     --status-code 200
 ```
 
