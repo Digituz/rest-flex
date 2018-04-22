@@ -35,8 +35,8 @@ var RestFlexClient = function () {
 
   _createClass(RestFlexClient, [{
     key: 'insert',
-    value: function insert(transaction) {
-      return this.client.post('/', transaction);
+    value: function insert(object) {
+      return this.client.post('/', object);
     }
   }, {
     key: 'get',
@@ -57,8 +57,8 @@ var RestFlexClient = function () {
     }
   }, {
     key: 'update',
-    value: function update(id, transaction) {
-      return this.client.put('/' + id, transaction);
+    value: function update(id, object) {
+      return this.client.put('/' + id, object);
     }
   }, {
     key: 'remove',
