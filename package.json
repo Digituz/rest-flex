@@ -6,7 +6,7 @@
     "start": "node src/index"
   },
   "keywords": [],
-  "author": "",
+  "author": "Bruno Krebs",
   "license": "MIT",
   "description": "",
   "dependencies": {
