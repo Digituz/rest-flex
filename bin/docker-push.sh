@@ -1,3 +1,3 @@
-docker build -t brunokrebs/secured-wildcard .
-docker tag brunokrebs/secured-wildcard brunokrebs/secured-wildcard
-docker push brunokrebs/secured-wildcard
+docker build -t digituz/rest-flex .
+docker tag digituz/rest-flex digituz/rest-flex
+docker push digituz/rest-flex
