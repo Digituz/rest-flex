@@ -78,5 +78,5 @@ app.use(bodyParser());
 app.use(router.routes());
 app.use(router.allowedMethods());
 
-app.listen(3001);
-console.log('### Listening on port 3001. Have fun!');
+app.listen(80);
+console.log('### Listening on port 80. Have fun!');
