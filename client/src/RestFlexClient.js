@@ -6,18 +6,29 @@ const timeout = 5000;
 class RestFlexClient {
   constructor(baseURL, audience, domain, auth0Config) {
     Auth0.configure(auth0Config);
-    Auth0.subscribe((authenticated) => {
-      if (authenticated) {
-        const entityToken = Auth0.getExtraToken(baseURL);
-        if (!entityToken) {
-          Auth0.silentAuth(baseURL, audience, `get:${domain} put:${domain} delete:${domain} post:${domain}`)
-            .then(() => {
-              this.updateClient(authenticated, baseURL);
-            });
-        }
-      }
 
-      this.updateClient(authenticated, baseURL);
+    this.audience = audience;
+    this.baseURL = baseURL;
+    this.domain = domain;
+    this.updateClient(Auth0.isAuthenticated(), baseURL);
+  }
+
+  connectClient() {
+    return new Promise((resolve, reject) => {
+      if (Auth0.isAuthenticated()) {
+        const entityToken = Auth0.getExtraToken(this.baseURL);
+        if (!entityToken) {
+          Auth0.silentAuth(this.baseURL, this.audience, `get:${this.domain} put:${this.domain} delete:${this.domain} post:${this.domain}`)
+            .then(() => {
+              this.updateClient(true, this.baseURL);
+              resolve();
+            });
+        } else {
+          resolve();
+        }
+      } else {
+        reject('No session');
+      }
     });
   }
 
@@ -42,14 +53,16 @@ class RestFlexClient {
 
   get(id) {
     return new Promise((resolve, reject) => {
-      this.client.get(`/${id || ''}`).then((response) => {
-        let data = response.data;
-        if (Array.isArray(response.data)) {
-          data = data.map(RestFlexClient.jsonToObject);
-        } else {
-          data = RestFlexClient.jsonToObject(data);
-        }
-        resolve(data);
+      this.connectClient().then(() => {
+        this.client.get(`/${id || ''}`).then((response) => {
+          let data = response.data;
+          if (Array.isArray(response.data)) {
+            data = data.map(RestFlexClient.jsonToObject);
+          } else {
+            data = RestFlexClient.jsonToObject(data);
+          }
+          resolve(data);
+        }).catch(reject);
       }).catch(reject);
     });
   };

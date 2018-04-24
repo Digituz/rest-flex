@@ -11,27 +11,38 @@ var timeout = 5000;
 
 var RestFlexClient = function () {
   function RestFlexClient(baseURL, audience, domain, auth0Config) {
-    var _this = this;
-
     _classCallCheck(this, RestFlexClient);
 
-    console.log(auth0Config);
     Auth0.configure(auth0Config);
-    Auth0.subscribe(function (authenticated) {
-      if (authenticated) {
-        var entityToken = Auth0.getExtraToken(baseURL);
-        if (!entityToken) {
-          Auth0.silentAuth(baseURL, audience, 'get:' + domain + ' put:' + domain + ' delete:' + domain + ' post:' + domain).then(function () {
-            _this.updateClient(authenticated, baseURL);
-          });
-        }
-      }
 
-      _this.updateClient(authenticated, baseURL);
-    });
+    this.audience = audience;
+    this.baseURL = baseURL;
+    this.domain = domain;
+    this.updateClient(Auth0.isAuthenticated(), baseURL);
   }
 
   _createClass(RestFlexClient, [{
+    key: 'connectClient',
+    value: function connectClient() {
+      var _this = this;
+
+      return new Promise(function (resolve, reject) {
+        if (Auth0.isAuthenticated()) {
+          var entityToken = Auth0.getExtraToken(_this.baseURL);
+          if (!entityToken) {
+            Auth0.silentAuth(_this.baseURL, _this.audience, 'get:' + _this.domain + ' put:' + _this.domain + ' delete:' + _this.domain + ' post:' + _this.domain).then(function () {
+              _this.updateClient(true, _this.baseURL);
+              resolve();
+            });
+          } else {
+            resolve();
+          }
+        } else {
+          reject('No session');
+        }
+      });
+    }
+  }, {
     key: 'updateClient',
     value: function updateClient(authenticated, baseURL) {
       var axiosConfig = {
@@ -58,14 +69,16 @@ var RestFlexClient = function () {
       var _this2 = this;
 
       return new Promise(function (resolve, reject) {
-        _this2.client.get('/' + (id || '')).then(function (response) {
-          var data = response.data;
-          if (Array.isArray(response.data)) {
-            data = data.map(RestFlexClient.jsonToObject);
-          } else {
-            data = RestFlexClient.jsonToObject(data);
-          }
-          resolve(data);
+        _this2.connectClient().then(function () {
+          _this2.client.get('/' + (id || '')).then(function (response) {
+            var data = response.data;
+            if (Array.isArray(response.data)) {
+              data = data.map(RestFlexClient.jsonToObject);
+            } else {
+              data = RestFlexClient.jsonToObject(data);
+            }
+            resolve(data);
+          }).catch(reject);
         }).catch(reject);
       });
     }
