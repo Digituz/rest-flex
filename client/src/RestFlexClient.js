@@ -4,23 +4,36 @@ const Auth0 = require('auth0-web');
 const timeout = 5000;
 
 class RestFlexClient {
-  constructor(baseURL) {
+  constructor(baseURL, audience, domain) {
+    console.log(baseURL, audience, domain);
     Auth0.subscribe((authenticated) => {
       if (authenticated) {
-        this.client = axios.create({
-          baseURL,
-          timeout,
-          headers: {
-            'Authorization': `Bearer ${Auth0.getAccessToken()}`
-          },
-        });
+        const entityToken = Auth0.getExtraToken(baseURL);
+        if (!entityToken) {
+          Auth0.silentAuth(baseURL, audience, `get:${domain}, put:${domain}, delete:${domain} post:${domain}`)
+            .then(() => {
+              this.updateClient(authenticated, baseURL);
+            });
+        }
       } else {
-        this.client = axios.create({
-          baseURL,
-          timeout,
-        });
+        this.updateClient(authenticated, baseURL);
       }
     });
+  }
+
+  updateClient(authenticated, baseURL) {
+    const axiosConfig = {
+      baseURL,
+      timeout,
+    };
+
+    if (authenticated) {
+      axiosConfig.headers = {
+        'Authorization': `Bearer ${Auth0.getExtraToken(baseURL)}`
+      };
+    }
+
+    this.client = axios.create(axiosConfig);
   }
 
   insert(object) {

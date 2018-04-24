@@ -10,30 +10,43 @@ var Auth0 = require('auth0-web');
 var timeout = 5000;
 
 var RestFlexClient = function () {
-  function RestFlexClient(baseURL) {
+  function RestFlexClient(baseURL, audience, domain) {
     var _this = this;
 
     _classCallCheck(this, RestFlexClient);
 
+    console.log(baseURL, audience, domain);
     Auth0.subscribe(function (authenticated) {
       if (authenticated) {
-        _this.client = axios.create({
-          baseURL: baseURL,
-          timeout: timeout,
-          headers: {
-            'Authorization': 'Bearer ' + Auth0.getAccessToken()
-          }
-        });
+        var entityToken = Auth0.getExtraToken(baseURL);
+        if (!entityToken) {
+          Auth0.silentAuth(baseURL, audience, 'get:' + domain + ', put:' + domain + ', delete:' + domain + ' post:' + domain).then(function () {
+            _this.updateClient(authenticated, baseURL);
+          });
+        }
       } else {
-        _this.client = axios.create({
-          baseURL: baseURL,
-          timeout: timeout
-        });
+        _this.updateClient(authenticated, baseURL);
       }
     });
   }
 
   _createClass(RestFlexClient, [{
+    key: 'updateClient',
+    value: function updateClient(authenticated, baseURL) {
+      var axiosConfig = {
+        baseURL: baseURL,
+        timeout: timeout
+      };
+
+      if (authenticated) {
+        axiosConfig.headers = {
+          'Authorization': 'Bearer ' + Auth0.getExtraToken(baseURL)
+        };
+      }
+
+      this.client = axios.create(axiosConfig);
+    }
+  }, {
     key: 'insert',
     value: function insert(object) {
       return this.client.post('/', object);
