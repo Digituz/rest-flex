@@ -1,5 +1,5 @@
 const axios = require('axios');
-const Auth0 = require('auth0-web');
+const Auth0 = require('@digituz/auth0-web');
 
 const timeout = 5000;
 

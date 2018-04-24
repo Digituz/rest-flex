@@ -5,7 +5,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var axios = require('axios');
-var Auth0 = require('auth0-web');
+var Auth0 = require('@digituz/auth0-web');
 
 var timeout = 5000;
 
