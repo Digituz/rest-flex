@@ -99,3 +99,4 @@ var RestFlexClient = function () {
 }();
 
 module.exports = RestFlexClient;
+//# sourceMappingURL=RestFlexClient.js.map
