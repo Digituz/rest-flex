@@ -4,12 +4,13 @@ const Auth0 = require('auth0-web');
 const timeout = 5000;
 
 class RestFlexClient {
-  constructor(baseURL, audience, domain) {
-    console.log(baseURL, audience, domain);
+  constructor(baseURL, audience, domain, auth0Config) {
+    Auth0.configure(auth0Config);
     Auth0.subscribe((authenticated) => {
       if (authenticated) {
         const entityToken = Auth0.getExtraToken(baseURL);
         if (!entityToken) {
+          console.log(`Fetching ${audience} and putting it on ${baseURL}`);
           Auth0.silentAuth(baseURL, audience, `get:${domain}, put:${domain}, delete:${domain} post:${domain}`)
             .then(() => {
               this.updateClient(authenticated, baseURL);
