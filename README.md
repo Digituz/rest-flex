@@ -7,6 +7,7 @@ The easiest way to run RestFlex is with Docker. For example, if you were develop
 ```bash
 docker run --name projects-db \
   -p 27017:27017 \
+  --network digituz \
   -d mongo
 ```
 
@@ -15,9 +16,9 @@ Then, you would run a dockerized instance of RestFlex as follows:
 ```bash
 docker run --name projects-api \
   -e "DOMAIN=projects" \
-  -e "MONGODB_URL=projects-rest-flex-db:27017/projects" \
+  -e "MONGODB_URL=projects-db:27017/projects" \
   -e "AUTH0_DOMAIN=digituz-corp.auth0.com" \
-  -e "AUTH0_AUDIENCE=https://brand-house.digituz.com.br" \
+  -e "AUTH0_AUDIENCE=https://projects.digituz.com.br" \
   --network digituz \
   -p 3001:80 \
   -d digituz/rest-flex
