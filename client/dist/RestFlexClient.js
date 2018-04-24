@@ -15,19 +15,19 @@ var RestFlexClient = function () {
 
     _classCallCheck(this, RestFlexClient);
 
+    console.log(auth0Config);
     Auth0.configure(auth0Config);
     Auth0.subscribe(function (authenticated) {
       if (authenticated) {
         var entityToken = Auth0.getExtraToken(baseURL);
         if (!entityToken) {
-          console.log('Fetching ' + audience + ' and putting it on ' + baseURL);
-          Auth0.silentAuth(baseURL, audience, 'get:' + domain + ', put:' + domain + ', delete:' + domain + ' post:' + domain).then(function () {
+          Auth0.silentAuth(baseURL, audience, 'get:' + domain + ' put:' + domain + ' delete:' + domain + ' post:' + domain).then(function () {
             _this.updateClient(authenticated, baseURL);
           });
         }
-      } else {
-        _this.updateClient(authenticated, baseURL);
       }
+
+      _this.updateClient(authenticated, baseURL);
     });
   }
 

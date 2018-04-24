@@ -10,15 +10,14 @@ class RestFlexClient {
       if (authenticated) {
         const entityToken = Auth0.getExtraToken(baseURL);
         if (!entityToken) {
-          console.log(`Fetching ${audience} and putting it on ${baseURL}`);
-          Auth0.silentAuth(baseURL, audience, `get:${domain}, put:${domain}, delete:${domain} post:${domain}`)
+          Auth0.silentAuth(baseURL, audience, `get:${domain} put:${domain} delete:${domain} post:${domain}`)
             .then(() => {
               this.updateClient(authenticated, baseURL);
             });
         }
-      } else {
-        this.updateClient(authenticated, baseURL);
       }
+
+      this.updateClient(authenticated, baseURL);
     });
   }
 
