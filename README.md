@@ -14,11 +14,13 @@ docker run --name projects-db \
 Then, you would run a dockerized instance of RestFlex as follows:
 
 ```bash
-docker run --name projects-api \
-  -e "DOMAIN=projects" \
-  -e "MONGODB_URL=projects-db:27017/projects" \
+DOMAIN=projects
+
+docker run --name $DOMAIN-api \
+  -e "DOMAIN=$DOMAIN" \
+  -e "MONGODB_URL=$DOMAIN-db:27017/$DOMAIN" \
   -e "AUTH0_DOMAIN=digituz-corp.auth0.com" \
-  -e "AUTH0_AUDIENCE=https://projects.digituz.com.br" \
+  -e "AUTH0_AUDIENCE=https://$DOMAIN.digituz.com.br" \
   --network digituz \
   -p 3001:80 \
   -d digituz/rest-flex
