@@ -30,7 +30,7 @@ app.use(async function exceptionHandler(ctx, next) {
 });
 app.use(cors());
 
-const {DOMAIN, AUTH0_DOMAIN, AUTH0_AUDIENCE, MONGODB_URL} = process.env;
+const {DOMAIN, AUTH0_DOMAIN, AUTH0_AUDIENCE, MONGODB_URL, PORT} = process.env;
 if (!DOMAIN || !AUTH0_DOMAIN || !AUTH0_AUDIENCE || !MONGODB_URL) {
   console.log('Please, set the following environment variables: DOMAIN, AUTH0_DOMAIN, AUTH0_AUDIENCE, and MONGODB_URL');
   process.exit(1);
@@ -78,5 +78,5 @@ app.use(bodyParser());
 app.use(router.routes());
 app.use(router.allowedMethods());
 
-app.listen(80);
-console.log('### Listening on port 80. Have fun!');
+app.listen(PORT || 80);
+console.log(`### Listening on port ${PORT || 80}. Have fun!`);
