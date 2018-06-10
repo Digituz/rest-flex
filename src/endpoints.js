@@ -1,50 +1,53 @@
-const mongo = require('./mongo');
+const GenericMongo = require('./mongo');
 
-module.exports = {
-  getEntities, getEntity, addNewEntity, updateEntity, deleteEntity
-};
+class DomainAPI {
+  constructor(domain, mongoDbUrl) {
+    this.mongo = new GenericMongo(domain, mongoDbUrl);
+  }
 
-async function getEntities(ctx) {
-  const {state, query} = ctx;
+  async getEntities(ctx) {
+    const {state, query} = ctx;
 
-  ctx.body = await mongo.find(
-    state.user.sub,
-    state.entity,
-    JSON.parse(query.filter || '{}'),
-    JSON.parse(query.sort || '{}')
-  );
+    ctx.body = await this.mongo.find(
+      state.id,
+      JSON.parse(query.filter || '{}'),
+      JSON.parse(query.sort || '{}')
+    );
 
-  ctx.body = ctx.body || [];
-  ok(ctx);
-}
+    ctx.body = ctx.body || [];
+    ok(ctx);
+  }
 
-async function getEntity(ctx) {
-  ctx.body = await mongo.findOne(ctx.state.user.sub, ctx.state.entity);
-  ctx.body ? ok(ctx) : notFound(ctx);
-}
+  async getEntity(ctx) {
+    ctx.body = await this.mongo.findOne(ctx.state.id);
+    ctx.body ? this._ok(ctx) : this._notFound(ctx);
+  }
 
-async function addNewEntity(ctx) {
-  await mongo.insert(ctx.state.user.sub, ctx.state.entity, ctx.request.body);
-  ok(ctx);
-}
+  async addNewEntity(ctx) {
+    await this.mongo.insert(ctx.request.body);
+    ok(ctx);
+  }
 
-async function updateEntity(ctx) {
-  await mongo.update(ctx.state.user.sub, ctx.state.entity, ctx.request.body);
-  ok(ctx);
-}
+  async updateEntity(ctx) {
+    await this.mongo.update(ctx.state.id, ctx.request.body);
+    ok(ctx);
+  }
 
-async function deleteEntity(ctx) {
-  (await mongo.deleteOne(ctx.state.user.sub, ctx.state.entity)).deletedCount > 0 ? ok(ctx) : notFound(ctx);
-}
+  async deleteEntity(ctx) {
+    (await this.mongo.deleteOne(ctx.state.id)).deletedCount > 0 ? ok(ctx) : notFound(ctx);
+  }
 
-function ok(ctx) {
-  ctx.status = 200;
-  ctx.body = ctx.body || {message: "Ok"};
-}
+  _ok(ctx) {
+    ctx.status = 200;
+    ctx.body = ctx.body || {message: "Ok"};
+  }
 
-function notFound(ctx) {
-  ctx.status = 404;
-  ctx.body = {
-    message: "Not Found"
+  _notFound(ctx) {
+    ctx.status = 404;
+    ctx.body = {
+      message: "Not Found"
+    }
   }
 }
+
+module.exports = DomainAPI;
