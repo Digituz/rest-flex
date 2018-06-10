@@ -72,4 +72,4 @@ function GenericRouter({ domain, auth0Domain, auth0Audience, mongoDBUrl, publicR
   return router;
 }
 
-module.exports = RestFlex;
+module.exports = GenericRouter;
