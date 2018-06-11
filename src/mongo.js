@@ -34,7 +34,7 @@ class GenericMongo {
     }
   }
 
-  async find(id, filter, sort) {
+  async find(filter, sort) {
     const collection = await this.getCollection();
     const result = await collection.find(filter).sort(sort);
     return await result.toArray();

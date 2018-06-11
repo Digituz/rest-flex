@@ -11,10 +11,9 @@ class DomainAPI {
   }
 
   async getEntities(ctx) {
-    const {state, query} = ctx;
+    const {query} = ctx;
 
     ctx.body = await this.mongo.find(
-      state.id,
       JSON.parse(query.filter || '{}'),
       JSON.parse(query.sort || '{}')
     );
