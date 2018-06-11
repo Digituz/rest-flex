@@ -6,11 +6,11 @@ class RestFlexClient {
     this.token = token;
 
     if (token) {
-
+      this.headers = !token ? {} : {
+        'Authorization': `Bearer ${token}`,
+      }
     }
-    this.headers = !token ? {} : {
-      'Authorization': `Bearer ${token}`,
-    }
+    this.headers = {};
   }
 
   insert(object) {
@@ -22,8 +22,10 @@ class RestFlexClient {
   };
 
   get(id) {
+    console.log('==============================', 2);
     return new Promise(async (resolve, reject) => {
       try {
+        console.log(`${this.baseURL}/${id || ''}`);
         const response = await fetch(`${this.baseURL}/${id || ''}`, {
           headers: this.headers,
         });
