@@ -1,79 +1,63 @@
-const axios = require('axios');
-const Auth0 = require('@digituz/auth0-web');
-
-const timeout = 5000;
+import fetch from 'isomorphic-unfetch';
 
 class RestFlexClient {
-  constructor(baseURL, audience, domain, auth0Config) {
-    Auth0.configure(auth0Config);
-
-    this.audience = audience;
+  constructor(baseURL, token) {
     this.baseURL = baseURL;
-    this.domain = domain;
-    this.updateClient(Auth0.isAuthenticated(), baseURL);
-  }
+    this.token = token;
 
-  connectClient() {
-    return new Promise((resolve, reject) => {
-      if (Auth0.isAuthenticated()) {
-        const entityToken = Auth0.getExtraToken(this.baseURL);
-        if (!entityToken) {
-          Auth0.silentAuth(this.baseURL, this.audience, `get:${this.domain} put:${this.domain} delete:${this.domain} post:${this.domain}`)
-            .then(() => {
-              this.updateClient(true, this.baseURL);
-              resolve();
-            });
-        } else {
-          resolve();
-        }
-      } else {
-        reject('No session');
-      }
-    });
-  }
+    if (token) {
 
-  updateClient(authenticated, baseURL) {
-    const axiosConfig = {
-      baseURL,
-      timeout,
-    };
-
-    if (authenticated) {
-      axiosConfig.headers = {
-        'Authorization': `Bearer ${Auth0.getExtraToken(baseURL)}`
-      };
     }
-
-    this.client = axios.create(axiosConfig);
+    this.headers = !token ? {} : {
+      'Authorization': `Bearer ${token}`,
+    }
   }
 
   insert(object) {
-    return this.client.post('/', object);
-  };
-
-  get(id) {
-    return new Promise((resolve, reject) => {
-      this.connectClient().then(() => {
-        this.client.get(`/${id || ''}`).then((response) => {
-          let data = response.data;
-          if (Array.isArray(response.data)) {
-            data = data.map(RestFlexClient.jsonToObject);
-          } else {
-            data = RestFlexClient.jsonToObject(data);
-          }
-          resolve(data);
-        }).catch(reject);
-      }).catch(reject);
+    return fetch(this.baseURL, {
+      method: 'POST',
+      headers: this.headers,
+      body: object,
     });
   };
 
-  update(id, object) {
-    return this.client.put(`/${id}`, object);
+  get(id) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const response = await fetch(`${this.baseURL}/${id || ''}`, {
+          headers: this.headers,
+        });
+        let data = await response.json();
+        if (Array.isArray(response.data)) {
+          data = data.map(RestFlexClient.jsonToObject);
+        } else {
+          data = RestFlexClient.jsonToObject(data);
+        }
+        resolve(data);
+      } catch (e) {
+        reject(e);
+      }
+    });
   };
 
-  remove(id) {
-    return this.client.delete(`/${id}`);
-  };
+  find(filter, sort) {
+    const filterParam = JSON.stringify(filter);
+    const sortParam = sort ? JSON.stringify(sort) : null;
+    let url = `${this.baseURL}/?`;
+    url = filter ? `${url}filter=${filterParam}&` : url;
+    url = sort ? `${url}sort=${sortParam}&` : url;
+    return fetch(url, {
+      headers: this.headers,
+    });
+  }
+
+  // update(id, object) {
+  //   return this.client.put(`/${id}`, object);
+  // };
+  //
+  // remove(id) {
+  //   return this.client.delete(`/${id}`);
+  // };
 
   static jsonToObject(json) {
     const properties = Object.getOwnPropertyNames(json);
