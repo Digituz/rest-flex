@@ -61,24 +61,21 @@ function GenericRouter({ domain, auth0Domain, auth0Audience, mongoDBUrl, publicR
     });
 
     if (hasScopes) {
-      ctx.state.entity = {
-        id: id
-      };
+      ctx.state.id = id;
       return await next();
     }
     return ctx.status = 401;
   }
 
   router.use(checkToken);
-  router.use(checkScopes);
 
   const domainAPI = new DomainAPI(domain, mongoDBUrl);
 
-  router.get('/', domainAPI.getEntities);
-  router.get('/:id', domainAPI.getEntity);
-  router.post('/', domainAPI.addNewEntity);
-  router.put('/:id', domainAPI.updateEntity);
-  router.delete('/:id', domainAPI.deleteEntity);
+  router.get('/', checkScopes, domainAPI.getEntities);
+  router.get('/:id', checkScopes, domainAPI.getEntity);
+  router.post('/', checkScopes, domainAPI.addNewEntity);
+  router.put('/:id', checkScopes, domainAPI.updateEntity);
+  router.delete('/:id', checkScopes, domainAPI.deleteEntity);
 
   return router;
 }
