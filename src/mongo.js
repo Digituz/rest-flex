@@ -10,8 +10,8 @@ class GenericMongo {
   async getCollection() {
     if (!this.collection) {
       const asyncConnect = promisify(mongodb.MongoClient.connect);
-      const connection = await asyncConnect('mongodb://' + this.mongoDbUrl);
-      this.collection = connection.collection(this.domain);
+      const db = (await asyncConnect(this.mongoDbUrl)).db('krebseng');
+      this.collection = db.collection(this.domain);
     }
     return this.collection;
   }

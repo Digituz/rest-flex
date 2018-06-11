@@ -3,6 +3,11 @@ const GenericMongo = require('./mongo');
 class DomainAPI {
   constructor(domain, mongoDbUrl) {
     this.mongo = new GenericMongo(domain, mongoDbUrl);
+    this.getEntities = this.getEntities.bind(this);
+    this.getEntity = this.getEntity.bind(this);
+    this.addNewEntity = this.addNewEntity.bind(this);
+    this.updateEntity = this.updateEntity.bind(this);
+    this.deleteEntity = this.deleteEntity.bind(this);
   }
 
   async getEntities(ctx) {
@@ -15,7 +20,7 @@ class DomainAPI {
     );
 
     ctx.body = ctx.body || [];
-    ok(ctx);
+    this._ok(ctx);
   }
 
   async getEntity(ctx) {
@@ -25,16 +30,16 @@ class DomainAPI {
 
   async addNewEntity(ctx) {
     await this.mongo.insert(ctx.request.body);
-    ok(ctx);
+    this._ok(ctx);
   }
 
   async updateEntity(ctx) {
     await this.mongo.update(ctx.state.id, ctx.request.body);
-    ok(ctx);
+    this._ok(ctx);
   }
 
   async deleteEntity(ctx) {
-    (await this.mongo.deleteOne(ctx.state.id)).deletedCount > 0 ? ok(ctx) : notFound(ctx);
+    (await this.mongo.deleteOne(ctx.state.id)).deletedCount > 0 ? this._ok(ctx) : this._notFound(ctx);
   }
 
   _ok(ctx) {

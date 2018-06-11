@@ -31,22 +31,30 @@ function GenericRouter({ domain, auth0Domain, auth0Audience, mongoDBUrl, publicR
     }
   });
 
-  router.use(jwt({
-    secret: koaJwtSecret({
-      jwksUri: `https://${auth0Domain}/.well-known/jwks.json`,
-      cache: true
-    }),
-    audience: auth0Audience,
-    issuer: `https://${auth0Domain}/`,
-    debug: true
-  }));
+  async function checkToken(ctx, next) {
+    const reading = ctx.method.toLowerCase() === 'get';
+    const writing = !reading;
+    if ((reading && publicRead) || (writing && publicWrite)) return next();
+    jwt({
+      secret: koaJwtSecret({
+        jwksUri: `https://${auth0Domain}/.well-known/jwks.json`,
+        cache: true
+      }),
+      audience: auth0Audience,
+      issuer: `https://${auth0Domain}/`,
+      debug: true,
+      passthrough: true,
+    })(ctx, next);
+  }
 
   async function checkScopes(ctx, next) {
     const {id} = ctx.params;
-    const reading = ctx.method === 'get';
+    const reading = ctx.method.toLowerCase() === 'get';
     const writing = !reading;
 
-    const scopes = ctx.state.user.scope.split(' ');
+    const user = ctx.state.user || { scope: '' };
+
+    const scopes = user.scope.split(' ');
     const scopeNeeded = ctx.method.toLowerCase() + ':' + domain;
     const hasScopes = (reading && publicRead) || (writing && publicWrite) || scopes.find(element => {
       return element === scopeNeeded;
@@ -61,14 +69,17 @@ function GenericRouter({ domain, auth0Domain, auth0Audience, mongoDBUrl, publicR
     return ctx.status = 401;
   }
 
+  router.use(checkToken);
+  router.use(checkScopes);
+
   const domainAPI = new DomainAPI(domain, mongoDBUrl);
 
-  router.get('/', checkScopes, domainAPI.getEntities);
-  router.get('/:id', checkScopes, domainAPI.getEntity);
-  router.post('/', checkScopes, domainAPI.addNewEntity);
-  router.put('/:id', checkScopes, domainAPI.updateEntity);
-  router.delete('/:id', checkScopes, domainAPI.deleteEntity);
-  
+  router.get('/', domainAPI.getEntities);
+  router.get('/:id', domainAPI.getEntity);
+  router.post('/', domainAPI.addNewEntity);
+  router.put('/:id', domainAPI.updateEntity);
+  router.delete('/:id', domainAPI.deleteEntity);
+
   return router;
 }
 
