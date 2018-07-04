@@ -27,14 +27,14 @@ var RestFlexClient = function () {
     (0, _classCallCheck3.default)(this, RestFlexClient);
 
     this.baseURL = baseURL;
-    this.token = token;
 
     if (token) {
       this.headers = !token ? {} : {
         'Authorization': 'Bearer ' + token
       };
+    } else {
+      this.headers = {};
     }
-    this.headers = {};
   }
 
   (0, _createClass3.default)(RestFlexClient, [{
@@ -51,7 +51,6 @@ var RestFlexClient = function () {
     value: function get(id) {
       var _this = this;
 
-      console.log('==============================', 2);
       return new Promise(function () {
         var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(resolve, reject) {
           var response, data;
@@ -60,42 +59,40 @@ var RestFlexClient = function () {
               switch (_context.prev = _context.next) {
                 case 0:
                   _context.prev = 0;
-
-                  console.log(_this.baseURL + '/' + (id || ''));
-                  _context.next = 4;
+                  _context.next = 3;
                   return (0, _isomorphicUnfetch2.default)(_this.baseURL + '/' + (id || ''), {
                     headers: _this.headers
                   });
 
-                case 4:
+                case 3:
                   response = _context.sent;
-                  _context.next = 7;
+                  _context.next = 6;
                   return response.json();
 
-                case 7:
+                case 6:
                   data = _context.sent;
 
-                  if (Array.isArray(response.data)) {
+                  if (Array.isArray(data)) {
                     data = data.map(RestFlexClient.jsonToObject);
                   } else {
                     data = RestFlexClient.jsonToObject(data);
                   }
                   resolve(data);
-                  _context.next = 15;
+                  _context.next = 14;
                   break;
 
-                case 12:
-                  _context.prev = 12;
+                case 11:
+                  _context.prev = 11;
                   _context.t0 = _context['catch'](0);
 
                   reject(_context.t0);
 
-                case 15:
+                case 14:
                 case 'end':
                   return _context.stop();
               }
             }
-          }, _callee, _this, [[0, 12]]);
+          }, _callee, _this, [[0, 11]]);
         }));
 
         return function (_x, _x2) {
@@ -115,15 +112,23 @@ var RestFlexClient = function () {
         headers: this.headers
       });
     }
-
-    // update(id, object) {
-    //   return this.client.put(`/${id}`, object);
-    // };
-    //
-    // remove(id) {
-    //   return this.client.delete(`/${id}`);
-    // };
-
+  }, {
+    key: 'update',
+    value: function update(id, object) {
+      return (0, _isomorphicUnfetch2.default)(this.baseURL + '/' + id, {
+        method: 'PUT',
+        headers: this.headers,
+        body: JSON.stringify(object)
+      });
+    }
+  }, {
+    key: 'remove',
+    value: function remove(id) {
+      return (0, _isomorphicUnfetch2.default)(this.baseURL + '/' + id, {
+        method: 'DELETE',
+        headers: this.headers
+      });
+    }
   }], [{
     key: 'jsonToObject',
     value: function jsonToObject(json) {

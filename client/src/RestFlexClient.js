@@ -3,14 +3,14 @@ import fetch from 'isomorphic-unfetch';
 class RestFlexClient {
   constructor(baseURL, token) {
     this.baseURL = baseURL;
-    this.token = token;
 
     if (token) {
       this.headers = !token ? {} : {
         'Authorization': `Bearer ${token}`,
-      }
+      };
+    } else {
+      this.headers = {};
     }
-    this.headers = {};
   }
 
   insert(object) {
@@ -22,15 +22,13 @@ class RestFlexClient {
   };
 
   get(id) {
-    console.log('==============================', 2);
     return new Promise(async (resolve, reject) => {
       try {
-        console.log(`${this.baseURL}/${id || ''}`);
         const response = await fetch(`${this.baseURL}/${id || ''}`, {
           headers: this.headers,
         });
         let data = await response.json();
-        if (Array.isArray(response.data)) {
+        if (Array.isArray(data)) {
           data = data.map(RestFlexClient.jsonToObject);
         } else {
           data = RestFlexClient.jsonToObject(data);
@@ -53,13 +51,20 @@ class RestFlexClient {
     });
   }
 
-  // update(id, object) {
-  //   return this.client.put(`/${id}`, object);
-  // };
-  //
-  // remove(id) {
-  //   return this.client.delete(`/${id}`);
-  // };
+  update(id, object) {
+    return fetch(`${this.baseURL}/${id}`, {
+      method: 'PUT',
+      headers: this.headers,
+      body: JSON.stringify(object)
+    });
+  }
+
+  remove(id) {
+    return fetch(`${this.baseURL}/${id}`, {
+      method: 'DELETE',
+      headers: this.headers,
+    });
+  }
 
   static jsonToObject(json) {
     const properties = Object.getOwnPropertyNames(json);
