@@ -35,7 +35,7 @@ function GenericRouter({ domain, auth0Domain, auth0Audience, mongoDBUrl, publicR
     const reading = ctx.method.toLowerCase() === 'get';
     const writing = !reading;
     if ((reading && publicRead) || (writing && publicWrite)) return next();
-    jwt({
+    return jwt({
       secret: koaJwtSecret({
         jwksUri: `https://${auth0Domain}/.well-known/jwks.json`,
         cache: true
