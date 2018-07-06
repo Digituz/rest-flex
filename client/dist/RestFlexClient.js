@@ -8,6 +8,10 @@ var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
 
 var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
 
+var _extends2 = require('babel-runtime/helpers/extends');
+
+var _extends3 = _interopRequireDefault(_extends2);
+
 var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
@@ -42,8 +46,10 @@ var RestFlexClient = function () {
     value: function insert(object) {
       return (0, _isomorphicUnfetch2.default)(this.baseURL, {
         method: 'POST',
-        headers: this.headers,
-        body: object
+        headers: (0, _extends3.default)({}, this.headers, {
+          'Content-Type': 'application/json'
+        }),
+        body: JSON.stringify(object)
       });
     }
   }, {
@@ -117,7 +123,9 @@ var RestFlexClient = function () {
     value: function update(id, object) {
       return (0, _isomorphicUnfetch2.default)(this.baseURL + '/' + id, {
         method: 'PUT',
-        headers: this.headers,
+        headers: (0, _extends3.default)({}, this.headers, {
+          'Content-Type': 'application/json'
+        }),
         body: JSON.stringify(object)
       });
     }

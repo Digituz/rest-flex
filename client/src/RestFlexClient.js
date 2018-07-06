@@ -16,8 +16,11 @@ class RestFlexClient {
   insert(object) {
     return fetch(this.baseURL, {
       method: 'POST',
-      headers: this.headers,
-      body: object,
+      headers: {
+        ...this.headers,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(object),
     });
   };
 
@@ -54,7 +57,10 @@ class RestFlexClient {
   update(id, object) {
     return fetch(`${this.baseURL}/${id}`, {
       method: 'PUT',
-      headers: this.headers,
+      headers: {
+        ...this.headers,
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify(object)
     });
   }
