@@ -30,7 +30,7 @@ class GenericMongo {
     const collection = await this.getCollection();
     if (!Array.isArray(data)) {
       delete data._id;
-      await collection.updateOne({_id: id }, { $set: { ...data } });
+      await collection.updateOne({_id: mongodb.ObjectId(id) }, { $set: { ...data } });
     }
   }
 
