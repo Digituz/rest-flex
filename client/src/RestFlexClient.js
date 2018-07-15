@@ -77,7 +77,7 @@ class RestFlexClient {
     const object = {};
     properties.forEach((property) => {
       let value = json[property];
-      if (isDate(value)) {
+      if (RestFlexClient.isDate(value)) {
         value = new Date(value);
       }
       object[property] = isNaN(value) ? json[property] : value;
