@@ -144,7 +144,7 @@ var RestFlexClient = function () {
       var object = {};
       properties.forEach(function (property) {
         var value = json[property];
-        if (isDate(value)) {
+        if (RestFlexClient.isDate(value)) {
           value = new Date(value);
         }
         object[property] = isNaN(value) ? json[property] : value;
