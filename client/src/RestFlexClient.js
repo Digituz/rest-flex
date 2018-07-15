@@ -77,13 +77,25 @@ class RestFlexClient {
     const object = {};
     properties.forEach((property) => {
       let value = json[property];
-      if (value.length >= 24) {
+      if (isDate(value)) {
         value = new Date(value);
       }
       object[property] = isNaN(value) ? json[property] : value;
     });
     return object;
   };
+
+  static isDate(value) {
+    if (value.length !== 25) return false;
+    if (value.substring(4) !== '-') return false;
+    if (value.substring(7) !== '-') return false;
+    if (value.substring(10) !== 'T') return false;
+    if (value.substring(13) !== ':') return false;
+    if (value.substring(16) !== ':') return false;
+    if (value.substring(21) !== ':') return false;
+    return (value.replace(/\D/g, '') + '').length === 18;
+
+  }
 }
 
 module.exports = RestFlexClient;
