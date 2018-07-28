@@ -154,6 +154,7 @@ var RestFlexClient = function () {
   }, {
     key: 'isDate',
     value: function isDate(value) {
+      if (!value) return false;
       if (value.length !== 25) return false;
       if (value.substring(4) !== '-') return false;
       if (value.substring(7) !== '-') return false;
